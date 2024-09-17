@@ -9,3 +9,4 @@ services:
         source: .
         target: /build
     privileged: true
+    tty: true

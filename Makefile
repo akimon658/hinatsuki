@@ -1,19 +1,14 @@
 MOUNT_DIR = /tmp/hinatsuki-mnt
 
-dest/BOOTX64.EFI: dest/hello.o
-	lld-link-18 /subsystem:efi_application /entry:efi_main /out:$@ $<
-
-dest/disk.img: dest/BOOTX64.EFI
+dest/disk.img: deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi
 	qemu-img create -f raw $@ 200M
 	mkfs.fat -n 'HINATSUKI' -s 2 -f 2 -R 32 -F 32 $@
 	mkdir -p $(MOUNT_DIR)
 	mount -o loop $@ $(MOUNT_DIR)
 	mkdir -p $(MOUNT_DIR)/EFI/BOOT
-	cp $< $(MOUNT_DIR)/EFI/BOOT/
+	cp $< $(MOUNT_DIR)/EFI/BOOT/BOOTX64.EFI
 	umount $(MOUNT_DIR)
 
-dest/hello.o: src/hello.c
-	clang++-18 -target x86_64-pc-win32-coff -mno-red-zone -fno-stack-protector -fshort-wchar -Wall -c $< -o $@
-
-.PHONY: run
-run:
+deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi: HinatsukiLoaderPkg/Main.c HinatsukiLoaderPkg/Loader.inf HinatsukiLoaderPkg/HinatsukiLoaderPkg.dec HinatsukiLoaderPkg/HinatsukiLoaderPkg.dsc
+	make -C deps/edk2/BaseTools/Source/C
+	cd deps/edk2 && source edksetup.sh && build

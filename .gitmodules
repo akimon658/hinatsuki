@@ -1,6 +1,3 @@
-[submodule "deps/UEFI-CPP-headers"]
-	path = deps/UEFI-CPP-headers
-	url = https://github.com/VioletGiraffe/UEFI-CPP-headers.git
 [submodule "deps/edk2"]
 	path = deps/edk2
 	url = https://github.com/tianocore/edk2

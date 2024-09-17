@@ -1,0 +1,11 @@
+services:
+  build:
+    container_name: hinatsuki_build
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: .
+        target: /build
+    privileged: true

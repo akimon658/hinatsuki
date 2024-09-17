@@ -1,3 +1,4 @@
 [submodule "deps/edk2"]
 	path = deps/edk2
 	url = https://github.com/tianocore/edk2
+	ignore = dirty

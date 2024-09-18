@@ -11,4 +11,4 @@ dest/disk.img: deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi
 
 deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi: HinatsukiLoaderPkg/Main.c HinatsukiLoaderPkg/Loader.inf HinatsukiLoaderPkg/HinatsukiLoaderPkg.dec HinatsukiLoaderPkg/HinatsukiLoaderPkg.dsc
 	make -C deps/edk2/BaseTools/Source/C
-	cd deps/edk2 && source edksetup.sh && build
+	bash -c "cd deps/edk2 && source edksetup.sh && build"

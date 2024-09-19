@@ -1,6 +1,7 @@
 services:
   build:
     container_name: hinatsuki_build
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile

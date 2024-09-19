@@ -10,12 +10,14 @@ dest/disk.img: deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi 
 	cp dest/kernel.elf $(MOUNT_DIR)/kernel.elf
 	umount $(MOUNT_DIR)
 
-deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi: HinatsukiLoaderPkg/Main.c HinatsukiLoaderPkg/Loader.inf HinatsukiLoaderPkg/HinatsukiLoaderPkg.dec HinatsukiLoaderPkg/HinatsukiLoaderPkg.dsc
+deps/edk2/BaseTools/Source/C/bin/GenFw:
 	make -C deps/edk2/BaseTools/Source/C
+
+deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi: deps/edk2/BaseTools/Source/C/bin/GenFw HinatsukiLoaderPkg/Main.c HinatsukiLoaderPkg/Loader.inf HinatsukiLoaderPkg/HinatsukiLoaderPkg.dec HinatsukiLoaderPkg/HinatsukiLoaderPkg.dsc
 	bash -c "cd deps/edk2 && source edksetup.sh && build"
 
 dest/kernel.elf: kernel/main.o
-	ld.lld --entry KernelMain -z norelro --image-base 0x100000 --static -o $@ $<
+	ld.lld -L./deps/x86_64-elf/lib --entry KernelMain -z norelro -z separate-loadable-segments --image-base 0x100000 --static -o $@ $<
 
 kernel/main.o: kernel/main.cpp
-	clang++ -O2 -Wall -g --target=x86_64-elf -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -std=c++20 -c $< -o $@
+	clang++ -I./deps/x86_64-elf/include -I./deps/x86_64-elf/include/c++/v1 -nostdlibinc -O2 -Wall -g --target=x86_64-elf -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -std=c++20 -c $< -o $@

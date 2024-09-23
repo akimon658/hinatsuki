@@ -250,7 +250,7 @@ EFI_STATUS EFIAPI UefiMain(EFI_HANDLE image_handle,
 
   Print(L"Successfully got memory map\n");
 
-  Print(L"Drawing graphics...\n");
+  Print(L"Opening GOP...\n");
 
   EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
   status = OpenGOP(image_handle, &gop);
@@ -259,22 +259,7 @@ EFI_STATUS EFIAPI UefiMain(EFI_HANDLE image_handle,
     Halt();
   }
 
-  Print(L"Resolution: %ux%u, Pixel Format: %s, %u pixels/line\n",
-        gop->Mode->Info->HorizontalResolution,
-        gop->Mode->Info->VerticalResolution,
-        GetPixelFormatUnicode(gop->Mode->Info->PixelFormat),
-        gop->Mode->Info->PixelsPerScanLine);
-  Print(L"Frame Buffer: 0x%0lx - 0x%0lx, Size: %lu bytes\n",
-        gop->Mode->FrameBufferBase,
-        gop->Mode->FrameBufferBase + gop->Mode->FrameBufferSize,
-        gop->Mode->FrameBufferSize);
-
-  UINT8 *frame_buffer = (UINT8 *)gop->Mode->FrameBufferBase;
-  for (UINTN i = 0; i < gop->Mode->FrameBufferSize; i++) {
-    frame_buffer[i] = 255;
-  }
-
-  Print(L"Successfully drew graphics\n");
+  Print(L"Opened GOP\n");
 
   Print(L"Starting kernel...\n");
 

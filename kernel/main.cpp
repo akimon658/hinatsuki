@@ -47,6 +47,39 @@ public:
 
 void operator delete(void *_) noexcept {}
 
+const uint8_t kFontA[16] = {
+    0b00000000,
+    0b00011000, //    **
+    0b00011000, //    **
+    0b00011000, //    **
+    0b00011000, //    **
+    0b00100100, //   *  *
+    0b00100100, //   *  *
+    0b00100100, //   *  *
+    0b00100100, //   *  *
+    0b01111110, //  ******
+    0b01000010, //  *    *
+    0b01000010, //  *    *
+    0b01000010, //  *    *
+    0b11100111, // ***  ***
+    0b00000000, 0b00000000,
+};
+
+void WriteAscii(PixelWriter &writer, int x, int y, char c,
+                const PixelColor &color) {
+  if (c != 'A') {
+    return;
+  }
+
+  for (int dy = 0; dy < 16; dy++) {
+    for (int dx = 0; dx < 8; dx++) {
+      if ((kFontA[dy] << dx) & 0x80u) {
+        writer.Write(x + dx, y + dy, color);
+      }
+    }
+  }
+}
+
 extern "C" void KernelMain(const FrameBufferConfig &frame_buffer_config) {
   char pixel_writer_buf[sizeof(RGBResv8BitPerColorPixelWriter)];
   PixelWriter *pixel_writer;
@@ -65,21 +98,11 @@ extern "C" void KernelMain(const FrameBufferConfig &frame_buffer_config) {
 
   for (uint32_t x = 0; x < frame_buffer_config.horizontal_resolution; x++) {
     for (uint32_t y = 0; y < frame_buffer_config.vertical_resolution; y++) {
-      pixel_writer->Write(
-          x, y,
-          {static_cast<uint8_t>(255 * x *
-                                (frame_buffer_config.vertical_resolution - y) /
-                                frame_buffer_config.horizontal_resolution /
-                                frame_buffer_config.vertical_resolution),
-           static_cast<uint8_t>(
-               255 * y * (frame_buffer_config.horizontal_resolution - x) /
-               frame_buffer_config.vertical_resolution /
-               frame_buffer_config.horizontal_resolution),
-           static_cast<uint8_t>(255 * x * y /
-                                frame_buffer_config.horizontal_resolution /
-                                frame_buffer_config.vertical_resolution)});
+      pixel_writer->Write(x, y, {0, 0, 0});
     }
   }
+
+  WriteAscii(*pixel_writer, 50, 50, 'A', {255, 255, 255});
 
   while (true) {
     __asm__("hlt");

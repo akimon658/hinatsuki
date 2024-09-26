@@ -2,6 +2,7 @@
 #include "frame_buffer_config.hpp"
 #include "graphics.hpp"
 #include <cstdint>
+#include <cstdio>
 #include <new>
 
 void operator delete(void *_) noexcept {}
@@ -32,6 +33,12 @@ extern "C" void KernelMain(const FrameBufferConfig &frame_buffer_config) {
   for (char c = '!'; c <= '~'; ++i, ++c) {
     WriteAscii(*pixel_writer, 50 + i * 8, 50, c, {255, 255, 255});
   }
+
+  WriteString(*pixel_writer, 50, 66, "Hello World!", {255, 255, 0});
+
+  char buf[128];
+  snprintf(buf, 128, "1 + 2 = %d", 1 + 2);
+  WriteString(*pixel_writer, 50, 82, buf, {255, 0, 0});
 
   while (true) {
     __asm__("hlt");

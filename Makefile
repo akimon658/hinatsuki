@@ -1,3 +1,4 @@
+CFLAGS = -I./deps/x86_64-elf/include -nostdlibinc -O2 -Wall -g --target=x86_64-elf -ffreestanding -mno-red-zone
 CXXFLAGS = -I./deps/x86_64-elf/include -I./deps/x86_64-elf/include/c++/v1 -nostdlibinc -O2 -Wall -g --target=x86_64-elf -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -std=c++20
 MOUNT_DIR = /tmp/hinatsuki-mnt
 
@@ -26,8 +27,8 @@ deps/edk2/BaseTools/Source/C/bin/GenFw:
 deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi: deps/edk2/BaseTools/Source/C/bin/GenFw HinatsukiLoaderPkg/Main.c HinatsukiLoaderPkg/Loader.inf HinatsukiLoaderPkg/HinatsukiLoaderPkg.dec HinatsukiLoaderPkg/HinatsukiLoaderPkg.dsc kernel/elf.hpp kernel/frame_buffer_config.hpp
 	bash -c "cd deps/edk2 && source edksetup.sh && build"
 
-dest/kernel.elf: asset/hankaku.o kernel/font.o kernel/graphics.o kernel/main.o
-	ld.lld -L./deps/x86_64-elf/lib --entry KernelMain -z norelro --image-base 0x100000 --static -o $@ $^
+dest/kernel.elf: asset/hankaku.o kernel/font.o kernel/graphics.o kernel/main.o kernel/newlib_support.o
+	ld.lld -L./deps/x86_64-elf/lib --entry KernelMain -z norelro --image-base 0x100000 --static -o $@ $^ -lc
 
 kernel/font.o: kernel/font.cpp kernel/font.hpp kernel/graphics.hpp
 	clang++ $(CXXFLAGS) -c $< -o $@
@@ -37,3 +38,6 @@ kernel/graphics.o: kernel/graphics.cpp kernel/graphics.hpp kernel/frame_buffer_c
 
 kernel/main.o: kernel/main.cpp kernel/frame_buffer_config.hpp
 	clang++ $(CXXFLAGS) -c $< -o $@
+
+kernel/newlib_support.o: kernel/newlib_support.c
+	clang $(CFLAGS) -c $< -o $@

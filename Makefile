@@ -1,6 +1,15 @@
 CXXFLAGS = -I./deps/x86_64-elf/include -I./deps/x86_64-elf/include/c++/v1 -nostdlibinc -O2 -Wall -g --target=x86_64-elf -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -std=c++20
 MOUNT_DIR = /tmp/hinatsuki-mnt
 
+asset/hankaku.bin: asset/hankaku.txt script/convert_font.py
+	python3 script/convert_font.py --font $< --output $@
+
+asset/hankaku.o: asset/hankaku.bin
+	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
+
+asset/hankaku.txt:
+	wget -O $@ https://raw.githubusercontent.com/uchan-nos/mikanos/refs/tags/osbook_day05c/kernel/hankaku.txt
+
 dest/disk.img: deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi dest/kernel.elf
 	qemu-img create -f raw $@ 200M
 	mkfs.fat -n 'HINATSUKI' -s 2 -f 2 -R 32 -F 32 $@
@@ -17,7 +26,7 @@ deps/edk2/BaseTools/Source/C/bin/GenFw:
 deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi: deps/edk2/BaseTools/Source/C/bin/GenFw HinatsukiLoaderPkg/Main.c HinatsukiLoaderPkg/Loader.inf HinatsukiLoaderPkg/HinatsukiLoaderPkg.dec HinatsukiLoaderPkg/HinatsukiLoaderPkg.dsc kernel/elf.hpp kernel/frame_buffer_config.hpp
 	bash -c "cd deps/edk2 && source edksetup.sh && build"
 
-dest/kernel.elf: kernel/font.o kernel/graphics.o kernel/main.o
+dest/kernel.elf: asset/hankaku.o kernel/font.o kernel/graphics.o kernel/main.o
 	ld.lld -L./deps/x86_64-elf/lib --entry KernelMain -z norelro --image-base 0x100000 --static -o $@ $^
 
 kernel/font.o: kernel/font.cpp kernel/font.hpp kernel/graphics.hpp

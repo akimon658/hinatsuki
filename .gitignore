@@ -1,5 +1,6 @@
 *.o
 
+asset/
 deps/x86_64-elf/
 dest/
 

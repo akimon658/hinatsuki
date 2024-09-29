@@ -1,4 +1,4 @@
-#include "font.hpp"
+#include "console.hpp"
 #include "frame_buffer_config.hpp"
 #include "graphics.hpp"
 #include <cstdint>
@@ -29,16 +29,13 @@ extern "C" void KernelMain(const FrameBufferConfig &frame_buffer_config) {
     }
   }
 
-  int i = 0;
-  for (char c = '!'; c <= '~'; ++i, ++c) {
-    WriteAscii(*pixel_writer, 50 + i * 8, 50, c, {255, 255, 255});
-  }
-
-  WriteString(*pixel_writer, 50, 66, "Hello World!", {255, 255, 0});
+  Console console{*pixel_writer, {255, 255, 255}, {0, 0, 0}};
 
   char buf[128];
-  snprintf(buf, 128, "1 + 2 = %d", 1 + 2);
-  WriteString(*pixel_writer, 50, 82, buf, {255, 0, 0});
+  for (int i = 0; i < 26; i++) {
+    snprintf(buf, 128, "line %d\n", i);
+    console.PutString(buf);
+  }
 
   while (true) {
     __asm__("hlt");

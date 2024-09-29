@@ -27,8 +27,11 @@ deps/edk2/BaseTools/Source/C/bin/GenFw:
 deps/edk2/Build/HinatsukiLoaderX64/DEBUG_CLANGPDB/X64/Loader.efi: deps/edk2/BaseTools/Source/C/bin/GenFw HinatsukiLoaderPkg/Main.c HinatsukiLoaderPkg/Loader.inf HinatsukiLoaderPkg/HinatsukiLoaderPkg.dec HinatsukiLoaderPkg/HinatsukiLoaderPkg.dsc kernel/elf.hpp kernel/frame_buffer_config.hpp
 	bash -c "cd deps/edk2 && source edksetup.sh && build"
 
-dest/kernel.elf: asset/hankaku.o kernel/font.o kernel/graphics.o kernel/main.o kernel/newlib_support.o
+dest/kernel.elf: asset/hankaku.o kernel/console.o kernel/font.o kernel/graphics.o kernel/main.o kernel/newlib_support.o
 	ld.lld -L./deps/x86_64-elf/lib --entry KernelMain -z norelro --image-base 0x100000 --static -o $@ $^ -lc
+
+kernel/console.o: kernel/console.cpp kernel/console.hpp kernel/font.hpp kernel/graphics.hpp
+	clang++ $(CXXFLAGS) -c $< -o $@
 
 kernel/font.o: kernel/font.cpp kernel/font.hpp kernel/graphics.hpp
 	clang++ $(CXXFLAGS) -c $< -o $@
@@ -36,7 +39,7 @@ kernel/font.o: kernel/font.cpp kernel/font.hpp kernel/graphics.hpp
 kernel/graphics.o: kernel/graphics.cpp kernel/graphics.hpp kernel/frame_buffer_config.hpp
 	clang++ $(CXXFLAGS) -c $< -o $@
 
-kernel/main.o: kernel/main.cpp kernel/frame_buffer_config.hpp
+kernel/main.o: kernel/main.cpp kernel/console.hpp kernel/frame_buffer_config.hpp kernel/graphics.hpp
 	clang++ $(CXXFLAGS) -c $< -o $@
 
 kernel/newlib_support.o: kernel/newlib_support.c

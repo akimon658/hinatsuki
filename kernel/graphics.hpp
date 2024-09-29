@@ -34,3 +34,10 @@ public:
 
   virtual void Write(int x, int y, const PixelColor &c) override;
 };
+
+template <typename T> struct Vector2D {
+  T x, y;
+};
+
+void FillRectangle(PixelWriter &writer, const Vector2D<int> &pos,
+                   const Vector2D<int> &size, const PixelColor &c);
